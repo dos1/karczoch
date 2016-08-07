@@ -38,6 +38,7 @@ void Gamestate_Logic(struct Game *game, struct EmptyResources* data) {
 	if (data->noice > 10) {
 		data->noice=0;
 	}
+	AnimateCharacter(game, data->baby, 1);
 
 	AnimateCharacter(game, data->mom, 1);
 }
@@ -55,6 +56,26 @@ bool ShowIE(struct Game *game, struct TM_Action *action, enum TM_ActionState sta
 	if (state == TM_ACTIONSTATE_START) {
 		data->ie = true;
 		data->splash = false;
+		data->ieconnected = data->connected;
+
+		int r = rand() % 4;
+
+		if (data->ieconnected) {
+			switch (r) {
+				case 0:
+					al_play_sample_instance(data->midi1);
+					break;
+				case 1:
+					al_play_sample_instance(data->midi2);
+					break;
+				case 2:
+					al_play_sample_instance(data->midi3);
+					break;
+				case 3:
+					al_play_sample_instance(data->midi4);
+					break;
+			}
+		}
 	}
 	return true;
 }
@@ -79,8 +100,7 @@ bool Ring(struct Game *game, struct TM_Action *action, enum TM_ActionState state
 		if (data->connected || data->connecting) {
 			TM_AddBackgroundAction(data->timeline, Wait, TM_AddToArgs(NULL, 1, data), 1000, "wait");
 			TM_AddBackgroundAction(data->timeline, Try, TM_AddToArgs(NULL, 1, data), 11000, "try");
-			TM_AddBackgroundAction(data->timeline, Wait, TM_AddToArgs(NULL, 1, data), 13000, "wait");
-			TM_AddBackgroundAction(data->timeline, Leave, TM_AddToArgs(NULL, 1, data), 14000, "leave");
+
 
 		} else {
 			al_play_sample_instance(data->ring);
@@ -90,12 +110,25 @@ bool Ring(struct Game *game, struct TM_Action *action, enum TM_ActionState state
 	}
 	return true;
 }
+bool Lose(struct Game *game, struct TM_Action *action, enum TM_ActionState state) {
+	struct EmptyResources *data = action->arguments->value;
+	if (state == TM_ACTIONSTATE_START) {
+	//	al_stop_sample_instance(data->ring);
+	//	SelectSpritesheet(game, data->mom, "wait");
+		data->lost=true;
+		al_stop_sample_instance(data->modem);
+		//al_start_sample_instance(data->yadayada);
+	}
+	return true;
+}
+
 
 bool Wait(struct Game *game, struct TM_Action *action, enum TM_ActionState state) {
 	struct EmptyResources *data = action->arguments->value;
 	if (state == TM_ACTIONSTATE_START) {
 		al_stop_sample_instance(data->ring);
 		SelectSpritesheet(game, data->mom, "wait");
+		data->incall=false;
 	}
 	return true;
 }
@@ -104,6 +137,7 @@ bool Sit(struct Game *game, struct TM_Action *action, enum TM_ActionState state)
 	struct EmptyResources *data = action->arguments->value;
 	if (state == TM_ACTIONSTATE_START) {
 		SelectSpritesheet(game, data->mom, "sit");
+		data->incall=false;
 
 	}
 	return true;
@@ -113,10 +147,16 @@ bool Talk(struct Game *game, struct TM_Action *action, enum TM_ActionState state
 	struct EmptyResources *data = action->arguments->value;
 	if (state == TM_ACTIONSTATE_START) {
 		SelectSpritesheet(game, data->mom, "talk");
-		TM_AddBackgroundAction(data->timeline, Wait, TM_AddToArgs(NULL, 1, data), 15000, "wait");
-		TM_AddBackgroundAction(data->timeline, Sit, TM_AddToArgs(NULL, 1, data), 17000, "sit");
-		TM_AddBackgroundAction(data->timeline, Ring, TM_AddToArgs(NULL, 1, data), 40000, "ring");
+		data->incall = true;
+		if (data->connected || data->connecting) {
+			TM_AddBackgroundAction(data->timeline, Wait, TM_AddToArgs(NULL, 1, data), 2000, "wait");
+			TM_AddBackgroundAction(data->timeline, Leave, TM_AddToArgs(NULL, 1, data), 3000, "Leave");
 
+		} else {
+			TM_AddBackgroundAction(data->timeline, Wait, TM_AddToArgs(NULL, 1, data), 15000, "wait");
+			TM_AddBackgroundAction(data->timeline, Sit, TM_AddToArgs(NULL, 1, data), 17000, "sit");
+			TM_AddBackgroundAction(data->timeline, Ring, TM_AddToArgs(NULL, 1, data), 40000, "ring");
+		}
 	}
 	return true;
 }
@@ -125,7 +165,14 @@ bool Try(struct Game *game, struct TM_Action *action, enum TM_ActionState state)
 	struct EmptyResources *data = action->arguments->value;
 	if (state == TM_ACTIONSTATE_START) {
 		SelectSpritesheet(game, data->mom, "try");
+		if (data->connected || data->connecting) {
+			TM_AddBackgroundAction(data->timeline, Wait, TM_AddToArgs(NULL, 1, data), 2000, "wait");
+			TM_AddBackgroundAction(data->timeline, Leave, TM_AddToArgs(NULL, 1, data), 3000, "leave");
+		} else {
+			TM_AddBackgroundAction(data->timeline, Wait, TM_AddToArgs(NULL, 1, data), 2000, "wait");
+			TM_AddBackgroundAction(data->timeline, Ring, TM_AddToArgs(NULL, 1, data), 8000, "ring");
 
+		}
 	}
 	return true;
 }
@@ -134,6 +181,8 @@ bool Leave(struct Game *game, struct TM_Action *action, enum TM_ActionState stat
 	struct EmptyResources *data = action->arguments->value;
 	if (state == TM_ACTIONSTATE_START) {
 		SelectSpritesheet(game, data->mom, "left");
+		data->incall=false;
+		TM_AddBackgroundAction(data->timeline, Lose, TM_AddToArgs(NULL, 1, data), 1500, "lose");
 
 	}
 	return true;
@@ -178,7 +227,13 @@ strftime(zegarek, 64, "%l:%M %p", tm);
 		}
 
 		if (data->ie) {
-			al_draw_bitmap(data->iebitmap, 0, 0, 0);
+			if (data->ieconnected) {
+				al_draw_bitmap(data->iebitmap, 0, 0, 0);
+				DrawCharacter(game, data->baby, al_map_rgb(255,255,255), 0);
+
+			} else {
+				al_draw_bitmap(data->iebitmap2, 0, 0, 0);
+			}
 
 
 		} else {
@@ -251,6 +306,11 @@ al_draw_bitmap(data->busy ? data->busycur : data->cursor, data->mousex * 2, data
 	al_draw_scaled_bitmap(data->floppy, 0, 0, 240, 180, 240, 120, 80, 60, 0);
 
 
+	if (data->lost) {
+		al_clear_to_color(al_map_rgb(0,0,0));
+		al_draw_text(data->font, al_map_rgb(255,255,255), game->viewport.width / 2, game->viewport.height / 2, ALLEGRO_ALIGN_CENTER, "YOU LOST!!!!1");
+	}
+
 	//al_draw_scaled_bitmap(data->screen, 0, 0, al_get_bitmap_width(data->screen), al_get_bitmap_height(data->screen), 240, 120, 80, 60, 0);
 	//al_use_transform(&game->projection);
 }
@@ -260,7 +320,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	// Called for each event in Allegro event queue.
 	// Here you can handle user input, expiring timers etc.
 	if ((ev->type==ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_ESCAPE)) {
-		SwitchGamestate(game, "gaem", "off"); // mark this gamestate to be stopped and unloaded
+		SwitchGamestate(game, "gaem", data->lost ? "menu" : "off"); // mark this gamestate to be stopped and unloaded
 		// When there are no active gamestates, the engine will quit.
 	}
  if (ev->type == ALLEGRO_EVENT_MOUSE_AXES) {
@@ -283,6 +343,12 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	 } else if ((data->mousex * 2 > 70) && (data->mousey * 2 < 70) && (data->mousex * 2 < 130))  {
 		 if (!data->ie) {
 			 data->connecting = true;
+			 if (data->incall) {
+				     TM_CleanBackgroundQueue(data->timeline);
+						 TM_AddBackgroundAction(data->timeline, Wait, TM_AddToArgs(NULL, 1, data), 1000, "wait");
+						 TM_AddBackgroundAction(data->timeline, Leave, TM_AddToArgs(NULL, 1, data), 1500, "leave");
+			    }
+
 			 TM_AddBackgroundAction(data->timeline, Connect, TM_AddToArgs(NULL, 1, data), 9000, "connect");
 	al_play_sample_instance(data->modem);
 		 }
@@ -291,8 +357,23 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	 if ((data->mousex * 2 > 425) && (data->mousey * 2 < 20)) {
 		 if (data->ie) {
 			 data->ie=false;
+			 al_stop_sample_instance(data->midi1);
+			 al_stop_sample_instance(data->midi2);
+			 al_stop_sample_instance(data->midi3);
+			 al_stop_sample_instance(data->midi4);
+
 		 }
 	 }
+
+	 if ((data->mousex * 2 > 313) && (data->mousex * 2 < 388) && (data->mousey * 2 > 169) && (data->mousey * 2 < 191)) {
+		if ((data->connected || data->connecting) && !data->splash && !data->ie) {
+			data->connected = false;
+			data->connecting = false;
+			al_stop_sample_instance(data->modem);
+		}
+	 }
+
+
 
 	 if ((data->mousex * 2 < 60) && (data->mousey * 2 > 333)) {
 		 SwitchGamestate(game, "gaem", "off");
@@ -319,6 +400,7 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 	data->room1 = al_load_bitmap(GetDataFilePath(game, "room1.png"));
 	data->room2 = al_load_bitmap(GetDataFilePath(game, "room2.png"));
 	data->iebitmap = al_load_bitmap(GetDataFilePath(game, "ie.png"));
+	data->iebitmap2 = al_load_bitmap(GetDataFilePath(game, "ie2.png"));
 	data->iesplash = al_load_bitmap(GetDataFilePath(game, "iesplash.png"));
 
 	data->shader = al_create_shader(ALLEGRO_SHADER_GLSL);
@@ -344,9 +426,7 @@ PrintConsole(game, "%s", al_get_shader_log(data->shader));
 	data->timeline = TM_Init(game, "gaem");
 	data->lines = TM_Init(game, "lines");
 
-	data->ie=false;
-	data->splash=false;
-	data->busy=false;
+
 
 	data->mom = CreateCharacter(game, "mom");
 
@@ -356,6 +436,10 @@ PrintConsole(game, "%s", al_get_shader_log(data->shader));
 	RegisterSpritesheet(game, data->mom, "try");
 	RegisterSpritesheet(game, data->mom, "talk");
 	LoadSpritesheets(game, data->mom);
+
+	data->baby = CreateCharacter(game, "baby");
+	RegisterSpritesheet(game, data->baby, "baby");
+	LoadSpritesheets(game, data->baby);
 
 	data->startup_sample = al_load_sample(GetDataFilePath(game, "startup.flac"));
 
@@ -371,6 +455,30 @@ PrintConsole(game, "%s", al_get_shader_log(data->shader));
 
 	data->modem = al_create_sample_instance(data->modem_sample);
 	al_attach_sample_instance_to_mixer(data->modem, game->audio.fx);
+
+
+	data->midi1_sample = al_load_sample(GetDataFilePath(game, "midi1.flac"));
+	data->midi1 = al_create_sample_instance(data->midi1_sample);
+	al_attach_sample_instance_to_mixer(data->midi1, game->audio.music);
+
+	data->midi2_sample = al_load_sample(GetDataFilePath(game, "midi2.flac"));
+	data->midi2 = al_create_sample_instance(data->midi2_sample);
+	al_attach_sample_instance_to_mixer(data->midi2, game->audio.music);
+
+	data->midi3_sample = al_load_sample(GetDataFilePath(game, "midi3.flac"));
+	data->midi3 = al_create_sample_instance(data->midi3_sample);
+	al_attach_sample_instance_to_mixer(data->midi3, game->audio.music);
+
+	data->midi4_sample = al_load_sample(GetDataFilePath(game, "midi4.flac"));
+	data->midi4 = al_create_sample_instance(data->midi4_sample);
+	al_attach_sample_instance_to_mixer(data->midi4, game->audio.music);
+
+	al_set_sample_instance_playmode(data->midi1, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_playmode(data->midi2, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_playmode(data->midi3, ALLEGRO_PLAYMODE_LOOP);
+	al_set_sample_instance_playmode(data->midi4, ALLEGRO_PLAYMODE_LOOP);
+
+
 
 	return data;
 }
@@ -395,10 +503,21 @@ void Gamestate_Start(struct Game *game, struct EmptyResources* data) {
 	data->mousey = 180/2;
 
 	data->chosen = 1;
+	data->lost = false;
+	data->ie=false;
+	data->splash=false;
+	data->busy=false;
+	data->connected = false;
+	data->connecting = false;
+	data->incall = false;
+	data->ieconnected = false;
 
 	data->noice = 1;
 	SelectSpritesheet(game, data->mom, "sit");
 	SetCharacterPosition(game, data->mom, 0, 0, 0);
+
+	SelectSpritesheet(game, data->baby, "baby");
+	SetCharacterPosition(game, data->baby, 5, 103, 0);
 
 	if (game->data != (void*)2) {
 		al_play_sample_instance(data->startup);
@@ -413,6 +532,11 @@ void Gamestate_Stop(struct Game *game, struct EmptyResources* data) {
 	al_stop_sample_instance(data->ring);
 	al_stop_sample_instance(data->modem);
 	al_stop_sample_instance(data->startup);
+
+	al_stop_sample_instance(data->midi1);
+	al_stop_sample_instance(data->midi2);
+	al_stop_sample_instance(data->midi3);
+	al_stop_sample_instance(data->midi4);
 }
 
 // Ignore those for now.

@@ -33,7 +33,7 @@ void Gamestate_Logic(struct Game *game, struct EmptyResources* data) {
 		data->chosen++;
 	}
 
-	if(data->chosen > (game->data ? 2 : 4)) {
+	if(data->chosen > (game->data ? 2 : 6)) {
 		SwitchGamestate(game, "intro", game->data ? "dosowisko" : "menu");
 	}
 }
@@ -91,7 +91,7 @@ al_clear_to_color(al_map_rgb(35, 31, 32));
 	al_draw_scaled_bitmap(data->screen, 0, 0, al_get_bitmap_width(data->screen), al_get_bitmap_height(data->screen), 240, 60, 80, 60, 0);
 
 	al_draw_scaled_bitmap(data->floppy, 0, 0, 240, 180, 240, 120, 80, 60, 0);
-	if(data->chosen > 2) {
+	if(data->chosen > 3) {
 
 		if (!game->data)
 			al_draw_scaled_bitmap(data->floppyinuse, 0, 0, 240, 180, 240, 120, 80, 60, 0);
@@ -134,6 +134,11 @@ PrintConsole(game, "%s", al_get_shader_log(data->shader));
 	data->floppytaken = al_load_bitmap(GetDataFilePath(game, "floppytaken.png"));
 	data->floppyinuse = al_load_bitmap(GetDataFilePath(game, "floppyinuse.png"));
 
+	ALLEGRO_SAMPLE *pc_sample = al_load_sample(GetDataFilePath(game, "pc.flac"));
+	ALLEGRO_SAMPLE_INSTANCE *pc = al_create_sample_instance(pc_sample);
+	al_attach_sample_instance_to_mixer(pc, game->audio.music);
+
+	game->data2 = (void*) pc;
 	return data;
 }
 
@@ -148,6 +153,11 @@ void Gamestate_Start(struct Game *game, struct EmptyResources* data) {
 	// Called when this gamestate gets control. Good place for initializing state,
 	// playing music etc.
 	data->blink_counter = 0;
+
+	if (!game->data) {
+		al_play_sample_instance(game->data2);
+
+	}
 
 	data->chosen = 1;
 }

@@ -27,16 +27,16 @@ struct EmptyResources {
 		ALLEGRO_SHADER *shader;
 		ALLEGRO_BITMAP *threef;
 
-		ALLEGRO_BITMAP *bitmap, *iebitmap, *iesplash, *busycur, *conbmp, *donebmp;
+		ALLEGRO_BITMAP *bitmap, *iebitmap, *iebitmap2, *iesplash, *busycur, *conbmp, *donebmp;
 
 		ALLEGRO_BITMAP *floppy, *floppytaken, *floppyinuse, *cursor, *room1, *room2;
 
 		ALLEGRO_BITMAP *screen;
 
-		ALLEGRO_SAMPLE *startup_sample, *ring_sample, *modem_sample;
-		ALLEGRO_SAMPLE_INSTANCE *startup, *ring, *modem;
+		ALLEGRO_SAMPLE *startup_sample, *ring_sample, *modem_sample, *midi1_sample, *midi2_sample, *midi3_sample, *midi4_sample;
+		ALLEGRO_SAMPLE_INSTANCE *startup, *ring, *modem, *midi1, *midi2, *midi3, *midi4;
 
-		struct Character *mom;
+		struct Character *mom, *baby;
 
 		int mousex, mousey;
 
@@ -44,5 +44,5 @@ struct EmptyResources {
 
 		struct Timeline *timeline, *lines;
 
-		bool busy, ie, splash, connecting, connected;
+		bool busy, ie, splash, connecting, connected, incall, lost, ieconnected;
 };

@@ -56,12 +56,6 @@ int main(int argc, char** argv) {
 
 	al_hide_mouse_cursor(game->display);
 
-	ALLEGRO_SAMPLE *pc_sample = al_load_sample(GetDataFilePath(game, "pc.flac"));
-	ALLEGRO_SAMPLE_INSTANCE *pc = al_create_sample_instance(pc_sample);
-	al_attach_sample_instance_to_mixer(pc, game->audio.music);
-	al_play_sample_instance(pc);
-
-	game->data2 = (void*) pc;
 
 	libsuperderpy_run(game);
 
