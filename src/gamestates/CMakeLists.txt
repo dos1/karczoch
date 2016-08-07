@@ -1,0 +1,12 @@
+register_gamestate("loading")
+register_gamestate("dosowisko")
+register_gamestate("intro")
+register_gamestate("menu")
+register_gamestate("about")
+register_gamestate("options")
+register_gamestate("gaem")
+register_gamestate("bsod")
+register_gamestate("off")
+register_gamestate("screensaver")
+
+add_subdirectory("rust")
