@@ -61,6 +61,7 @@ bool ShowIE(struct Game *game, struct TM_Action *action, enum TM_ActionState sta
 		int r = rand() % 4;
 
 		if (data->ieconnected) {
+			PrintConsole(game, "MUUUSIC: %d", r);
 			switch (r) {
 				case 0:
 					al_play_sample_instance(data->midi1);
@@ -71,11 +72,23 @@ bool ShowIE(struct Game *game, struct TM_Action *action, enum TM_ActionState sta
 				case 2:
 					al_play_sample_instance(data->midi3);
 					break;
-				case 3:
+				default:
 					al_play_sample_instance(data->midi4);
 					break;
 			}
 		}
+
+		if (rand() % 2) {
+			SelectSpritesheet(game, data->baby, "baby");
+		} else {
+			if (rand() % 2) {
+				SelectSpritesheet(game, data->baby, "cons");
+			} else {
+				SelectSpritesheet(game, data->baby, "party");
+
+			}
+		}
+
 	}
 	return true;
 }
@@ -228,8 +241,9 @@ strftime(zegarek, 64, "%l:%M %p", tm);
 
 		if (data->ie) {
 			if (data->ieconnected) {
-				al_draw_bitmap(data->iebitmap, 0, 0, 0);
+				al_clear_to_color(al_map_rgb(255,255,255));
 				DrawCharacter(game, data->baby, al_map_rgb(255,255,255), 0);
+				al_draw_bitmap(data->iebitmap, 0, 0, 0);
 
 			} else {
 				al_draw_bitmap(data->iebitmap2, 0, 0, 0);
@@ -439,6 +453,9 @@ PrintConsole(game, "%s", al_get_shader_log(data->shader));
 
 	data->baby = CreateCharacter(game, "baby");
 	RegisterSpritesheet(game, data->baby, "baby");
+	RegisterSpritesheet(game, data->baby, "cons");
+	RegisterSpritesheet(game, data->baby, "party");
+
 	LoadSpritesheets(game, data->baby);
 
 	data->startup_sample = al_load_sample(GetDataFilePath(game, "startup.flac"));
