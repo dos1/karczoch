@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=KARCZOCH
+Exec=karczoch
+Comment=AAAAA KARCZOCH
+Icon=karczoch
+Terminal=false
+Categories=Game;ArcadeGame;
