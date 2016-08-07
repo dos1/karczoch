@@ -155,7 +155,7 @@ SYMBOL_EXPORT void ResumeGamestate(struct Game *game, const char* name) {
 
 SYMBOL_EXPORT void SwitchGamestate(struct Game *game, const char* current, const char* n) {
 	StopGamestate(game, current);
-	UnloadGamestate(game, current);
+	//UnloadGamestate(game, current);
 	LoadGamestate(game, n);
 	StartGamestate(game, n);
 }
