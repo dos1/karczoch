@@ -23,7 +23,7 @@
 #include <allegro5/allegro_primitives.h>
 #include "options.h"
 
-int Gamestate_ProgressCount = 1; // number of loading steps as reported by Gamestate_Load
+int Gamestate_ProgressCount = 3; // number of loading steps as reported by Gamestate_Load
 
 void Gamestate_Logic(struct Game *game, struct EmptyResources* data) {
 	// Called 60 times per second. Here you should do all your game logic.
@@ -58,16 +58,17 @@ al_clear_to_color(al_map_rgb(35, 31, 32));
 		al_draw_text(data->font, data->chosen == 1 ? al_map_rgb(35, 31, 32) :  al_map_rgb(173, 173, 173), 3, 51, 0, game->config.fullscreen ? "1. Fullscreen: on" : "1. Fullscreen: off");
 		al_draw_text(data->font, data->chosen == 2 ? al_map_rgb(35, 31, 32) :  al_map_rgb(173, 173, 173), 3, 67, 0, game->config.fx ? "2. Sounds: on" : "2. Sounds: off");
 		al_draw_text(data->font, data->chosen == 3 ? al_map_rgb(35, 31, 32) :  al_map_rgb(173, 173, 173), 3, 83, 0, game->config.music ? "3. Music: on" : "3. Music: off");
-		al_draw_text(data->font, data->chosen == 4 ? al_map_rgb(35, 31, 32) :  al_map_rgb(173, 173, 173), 3, 99, 0, "4. Back");
-		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 115, 0, "");
-		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 131, 0, "Enter your choice:  ");
+		al_draw_text(data->font, data->chosen == 4 ? al_map_rgb(35, 31, 32) :  al_map_rgb(173, 173, 173), 3, 99, 0, data->homealone ? "4. Home alone mode: on" : "4. Home alone mode: off");
+		al_draw_text(data->font, data->chosen == 5 ? al_map_rgb(35, 31, 32) :  al_map_rgb(173, 173, 173), 3, 99+16, 0, "5. Back");
+		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 115+16, 0, "");
+		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 131+16, 0, "Enter your choice:  ");
 		if (data->blink_counter < 20) {
-		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 132, 0, "                   _");
-		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 133, 0, "                   _");
+		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 132+16, 0, "                   _");
+		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 133+16, 0, "                   _");
 }
 		char* lala = strdup("                   1");
 		lala[strlen(lala)-1] += data->chosen - 1;
-		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 131, 0, lala);
+		al_draw_text(data->font, al_map_rgb(173, 173, 173), 3, 131+16, 0, lala);
 		free(lala);
 
 		//if (data->blink_counter < 50) {
@@ -116,11 +117,11 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	if ((ev->type==ALLEGRO_EVENT_KEY_CHAR)) {
 		if (ev->keyboard.keycode == ALLEGRO_KEY_UP) {
 			data->chosen--;
-			if (data->chosen < 1) data->chosen = 4;
+			if (data->chosen < 1) data->chosen = 5;
 		}
 		if (ev->keyboard.keycode == ALLEGRO_KEY_DOWN) {
 			data->chosen++;
-			if (data->chosen > 4) data->chosen = 1;
+			if (data->chosen > 5) data->chosen = 1;
 		}
 		if (ev->keyboard.keycode == ALLEGRO_KEY_1) {
 			data->chosen=1;
@@ -133,6 +134,9 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 		}
 		if (ev->keyboard.keycode == ALLEGRO_KEY_4) {
 			data->chosen=4;
+		}
+		if (ev->keyboard.keycode == ALLEGRO_KEY_5) {
+			data->chosen=5;
 		}
 		data->blink_counter=0;
 	}
@@ -162,6 +166,10 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 			//	SwitchGamestate(game, "menu", "abount");
 			}
 			if (data->chosen == 4) {
+				data->homealone = !data->homealone;
+				SetConfigOption(game, "KARCZOCH", "homealone", data->homealone ? "1" : "0");
+			}
+			if (data->chosen == 5) {
 				SwitchGamestate(game, "options", "menu");
 			}
 		}
@@ -177,6 +185,7 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 
 	data->threef = al_load_bitmap(GetDataFilePath(game, "mpv-shot0003.png"));
 	data->bitmap = al_create_bitmap(480, 360);
+	(*progress)(game);
 
 	data->shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 	PrintConsole(game, "VERTEX: %d", al_attach_shader_source_file(data->shader, ALLEGRO_VERTEX_SHADER, "data/ex_shader_vertex.glsl"));
@@ -184,6 +193,7 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 	PrintConsole(game, "PIXEL: %d", al_attach_shader_source_file(data->shader, ALLEGRO_PIXEL_SHADER, "data/ex_shader_pixel.glsl"));
 PrintConsole(game, "%s", al_get_shader_log(data->shader));
   al_build_shader(data->shader);
+	(*progress)(game);
 
 	data->screen = al_load_bitmap(GetDataFilePath(game, "screen.png"));
 
@@ -207,6 +217,8 @@ void Gamestate_Start(struct Game *game, struct EmptyResources* data) {
 	data->blink_counter = 0;
 
 	data->chosen = 1;
+
+	data->homealone = GetConfigOptionDefault(game, "KARCZOCH", "homealone", "0")[0] == '1';
 }
 
 void Gamestate_Stop(struct Game *game, struct EmptyResources* data) {

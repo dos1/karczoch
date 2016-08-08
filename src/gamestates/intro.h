@@ -33,5 +33,8 @@ struct EmptyResources {
 
 		ALLEGRO_BITMAP *screen;
 
+		ALLEGRO_SAMPLE *hdd_sample;
+		ALLEGRO_SAMPLE_INSTANCE *hdd;
+
 		int chosen;
 };

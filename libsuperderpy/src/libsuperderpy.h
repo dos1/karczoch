@@ -117,7 +117,7 @@ struct Game {
 		const char* name;
 
 		LIBSUPERDERPY_DATA_TYPE *data;
-		LIBSUPERDERPY_DATA_TYPE *data2;
+		LIBSUPERDERPY_DATA_TYPE *data2, *data3;
 
 };
 

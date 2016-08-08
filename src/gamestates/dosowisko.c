@@ -25,7 +25,7 @@
 #include <libsuperderpy.h>
 #include "dosowisko.h"
 
-int Gamestate_ProgressCount = 5;
+int Gamestate_ProgressCount = 6;
 
 static const char* text = "# dosowisko.net";
 
@@ -177,10 +177,10 @@ al_clear_to_color(al_map_rgb(35, 31, 32));
 		al_set_target_bitmap(data->bitmap2);
 		WhiteNoise(game);
 		al_set_target_backbuffer(game->display);
-		}
-
+		} else {
 		al_use_shader(data->shader);
 		al_set_shader_int("scaleFactor", 1);
+		}
 		al_draw_scaled_bitmap(data->bitmap2, 0, 0, 240, 180, 240, 0, 80, 60, 0);
 		al_draw_scaled_bitmap(data->bitmap2, 0, 0, 240, 180, 240, 60, 80, 60, 0);
 		//al_draw_scaled_bitmap(data->bitmap, 0, 0, 240, 180, 240, 120, 80, 60, 0);
@@ -286,6 +286,7 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 	PrintConsole(game, "PIXEL: %d", al_attach_shader_source_file(data->shader, ALLEGRO_PIXEL_SHADER, "data/ex_shader_pixel.glsl"));
 PrintConsole(game, "%s", al_get_shader_log(data->shader));
   al_build_shader(data->shader);
+	(*progress)(game);
 
 	data->screen = al_load_bitmap(GetDataFilePath(game, "screen.png"));
 

@@ -24,7 +24,7 @@
 #include <allegro5/allegro_ttf.h>
 #include "off.h"
 
-int Gamestate_ProgressCount = 1; // number of loading steps as reported by Gamestate_Load
+int Gamestate_ProgressCount = 5; // number of loading steps as reported by Gamestate_Load
 
 void Gamestate_Logic(struct Game *game, struct EmptyResources* data) {
 	// Called 60 times per second. Here you should do all your game logic.
@@ -116,6 +116,7 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 
 	data->threef = al_load_bitmap(GetDataFilePath(game, "win95.png"));
 	data->bitmap = al_create_bitmap(960, 720);
+	(*progress)(game);
 
 	data->shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 	PrintConsole(game, "VERTEX: %d", al_attach_shader_source_file(data->shader, ALLEGRO_VERTEX_SHADER, "data/ex_shader_vertex.glsl"));
@@ -123,13 +124,16 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 	PrintConsole(game, "PIXEL: %d", al_attach_shader_source_file(data->shader, ALLEGRO_PIXEL_SHADER, "data/ex_shader_pixel.glsl"));
 PrintConsole(game, "%s", al_get_shader_log(data->shader));
   al_build_shader(data->shader);
+	(*progress)(game);
 
 	data->screen = al_load_bitmap(GetDataFilePath(game, "screen.png"));
+	(*progress)(game);
 
 	data->tada_sample = al_load_sample(GetDataFilePath(game, "tada.flac"));
 
 	data->tada = al_create_sample_instance(data->tada_sample);
 	al_attach_sample_instance_to_mixer(data->tada, game->audio.fx);
+	(*progress)(game);
 
 	data->floppy = al_load_bitmap(GetDataFilePath(game, "floppy.png"));
 	data->floppytaken = al_load_bitmap(GetDataFilePath(game, "floppytaken.png"));

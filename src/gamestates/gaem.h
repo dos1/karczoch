@@ -31,18 +31,21 @@ struct EmptyResources {
 
 		ALLEGRO_BITMAP *floppy, *floppytaken, *floppyinuse, *cursor, *room1, *room2;
 
-		ALLEGRO_BITMAP *screen;
+		ALLEGRO_BITMAP *screen, *gif;
 
 		ALLEGRO_SAMPLE *startup_sample, *ring_sample, *modem_sample, *midi1_sample, *midi2_sample, *midi3_sample, *midi4_sample;
-		ALLEGRO_SAMPLE_INSTANCE *startup, *ring, *modem, *midi1, *midi2, *midi3, *midi4;
+		ALLEGRO_SAMPLE_INSTANCE *startup, *ring, *modem;
+		ALLEGRO_AUDIO_STREAM *midi1, *midi2, *midi3, *midi4;
 
 		struct Character *mom, *baby;
 
 		int mousex, mousey;
 
 		int chosen, noice;
+int debug;
+    struct Timeline *timeline, *lines;
 
-		struct Timeline *timeline, *lines;
-
-		bool busy, ie, splash, connecting, connected, incall, lost, ieconnected;
+		bool busy, ie, splash, connecting, connected, incall, lost, ieconnected, content;
+		long long int screensaver, watched;
+		int loading;
 };

@@ -24,7 +24,7 @@
 #include <allegro5/allegro_primitives.h>
 #include "screensaver.h"
 
-int Gamestate_ProgressCount = 1; // number of loading steps as reported by Gamestate_Load
+int Gamestate_ProgressCount = 3; // number of loading steps as reported by Gamestate_Load
 
 void Gamestate_Logic(struct Game *game, struct EmptyResources* data) {
 	// Called 60 times per second. Here you should do all your game logic.
@@ -67,7 +67,7 @@ void Gamestate_Draw(struct Game *game, struct EmptyResources* data) {
 	//al_use_transform(&trans);
 
 
-	al_clear_to_color(al_map_rgb(0,0,0));
+	//al_clear_to_color(al_map_rgb(0,0,0));
 
 al_set_target_bitmap(data->bitmap);
 al_clear_to_color(al_map_rgb(35, 31, 32));
@@ -135,27 +135,8 @@ switch (data->windowses[i].color) {
 	al_draw_scaled_bitmap(data->bitmap, 0, 0, 480, 360, 0, 0, 240, 180, 0);
 	al_use_shader(NULL);
 
-	al_set_target_bitmap(data->bitmap);
-	al_clear_to_color(al_map_rgb(35, 31, 32));
-	al_set_target_backbuffer(game->display);
-
-	al_use_shader(data->shader);
-	al_set_shader_int("scaleFactor", 1);
-	al_draw_scaled_bitmap(data->bitmap, 0, 0, 240, 180, 240, 0, 80, 60, 0);
-	al_draw_scaled_bitmap(data->bitmap, 0, 0, 240, 180, 240, 60, 80, 60, 0);
-	//al_draw_scaled_bitmap(data->bitmap, 0, 0, 240, 180, 240, 120, 80, 60, 0);
-	al_use_shader(NULL);
 
 	al_draw_scaled_bitmap(data->screen, 0, 0, al_get_bitmap_width(data->screen), al_get_bitmap_height(data->screen), 0, 0, 240, 180, 0);
-	al_draw_scaled_bitmap(data->screen, 0, 0, al_get_bitmap_width(data->screen), al_get_bitmap_height(data->screen), 240, 0, 80, 60, 0);
-	al_draw_scaled_bitmap(data->screen, 0, 0, al_get_bitmap_width(data->screen), al_get_bitmap_height(data->screen), 240, 60, 80, 60, 0);
-
-	al_draw_scaled_bitmap(data->floppy, 0, 0, 240, 180, 240, 120, 80, 60, 0);
-	if(data->chosen == 2) {
-
-		if (!game->data)
-			al_draw_scaled_bitmap(data->floppyinuse, 0, 0, 240, 180, 240, 120, 80, 60, 0);
-}
 
 	//al_draw_scaled_bitmap(data->screen, 0, 0, al_get_bitmap_width(data->screen), al_get_bitmap_height(data->screen), 240, 120, 80, 60, 0);
 	//al_use_transform(&game->projection);
@@ -181,6 +162,7 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 
 	data->threef = al_load_bitmap(GetDataFilePath(game, "winlogo.png"));
 	data->bitmap = al_create_bitmap(480, 360);
+	(*progress)(game);
 
 	data->shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 	PrintConsole(game, "VERTEX: %d", al_attach_shader_source_file(data->shader, ALLEGRO_VERTEX_SHADER, "data/ex_shader_vertex.glsl"));
@@ -188,6 +170,7 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 	PrintConsole(game, "PIXEL: %d", al_attach_shader_source_file(data->shader, ALLEGRO_PIXEL_SHADER, "data/ex_shader_pixel.glsl"));
 PrintConsole(game, "%s", al_get_shader_log(data->shader));
   al_build_shader(data->shader);
+	(*progress)(game);
 
 	data->screen = al_load_bitmap(GetDataFilePath(game, "screen.png"));
 

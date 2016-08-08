@@ -24,7 +24,7 @@
 #include <allegro5/allegro_ttf.h>
 #include "bsod.h"
 
-int Gamestate_ProgressCount = 1; // number of loading steps as reported by Gamestate_Load
+int Gamestate_ProgressCount = 2; // number of loading steps as reported by Gamestate_Load
 
 void Gamestate_Logic(struct Game *game, struct EmptyResources* data) {
 	// Called 60 times per second. Here you should do all your game logic.
@@ -123,6 +123,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 		if (game->data == (void*)2) {
 			SwitchGamestate(game, "bsod", "off");
 		} else {
+			game->data = 0;
 			SwitchGamestate(game, "bsod", "intro");
 		}
 		game->data = NULL;
@@ -147,6 +148,7 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 	PrintConsole(game, "PIXEL: %d", al_attach_shader_source_file(data->shader, ALLEGRO_PIXEL_SHADER, "data/ex_shader_pixel.glsl"));
 PrintConsole(game, "%s", al_get_shader_log(data->shader));
   al_build_shader(data->shader);
+	(*progress)(game);
 
 	data->screen = al_load_bitmap(GetDataFilePath(game, "screen.png"));
 

@@ -32,6 +32,6 @@ struct EmptyResources {
 		ALLEGRO_BITMAP *floppy, *floppytaken, *floppyinuse;
 
 		ALLEGRO_BITMAP *screen;
-
-		int chosen;
+bool homealone;
+    int chosen;
 };

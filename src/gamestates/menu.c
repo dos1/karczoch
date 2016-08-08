@@ -24,7 +24,7 @@
 #include <allegro5/allegro_ttf.h>
 #include "menu.h"
 
-int Gamestate_ProgressCount = 1; // number of loading steps as reported by Gamestate_Load
+int Gamestate_ProgressCount = 4; // number of loading steps as reported by Gamestate_Load
 
 void Gamestate_Logic(struct Game *game, struct EmptyResources* data) {
 	// Called 60 times per second. Here you should do all your game logic.
@@ -163,6 +163,7 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 
 	data->threef = al_load_bitmap(GetDataFilePath(game, "mpv-shot0003.png"));
 	data->bitmap = al_create_bitmap(480, 360);
+	(*progress)(game);
 
 	data->shader = al_create_shader(ALLEGRO_SHADER_GLSL);
 	PrintConsole(game, "VERTEX: %d", al_attach_shader_source_file(data->shader, ALLEGRO_VERTEX_SHADER, "data/ex_shader_vertex.glsl"));
@@ -170,12 +171,14 @@ void* Gamestate_Load(struct Game *game, void (*progress)(struct Game*)) {
 	PrintConsole(game, "PIXEL: %d", al_attach_shader_source_file(data->shader, ALLEGRO_PIXEL_SHADER, "data/ex_shader_pixel.glsl"));
 PrintConsole(game, "%s", al_get_shader_log(data->shader));
   al_build_shader(data->shader);
+	(*progress)(game);
 
 	data->screen = al_load_bitmap(GetDataFilePath(game, "screen.png"));
 
 	data->floppy = al_load_bitmap(GetDataFilePath(game, "floppy.png"));
 	data->floppytaken = al_load_bitmap(GetDataFilePath(game, "floppytaken.png"));
 	data->floppyinuse = al_load_bitmap(GetDataFilePath(game, "floppyinuse.png"));
+	(*progress)(game);
 
 	data->szum_sample = al_load_sample(GetDataFilePath(game, "szum.flac"));
 	data->szum = al_create_sample_instance(data->szum_sample);
@@ -196,18 +199,18 @@ void Gamestate_Start(struct Game *game, struct EmptyResources* data) {
 	// playing music etc.
 	data->blink_counter = 0;
 
-	game->data = (void*)1;
-
 	data->chosen = 1;
 
-	if (game->data2) {
-	ALLEGRO_SAMPLE_INSTANCE *pc = (ALLEGRO_SAMPLE_INSTANCE*) game->data2;
-	al_stop_sample_instance(game->data2);
-	game->data2 = NULL;
+	if (!game->data) {
+		al_stop_sample_instance((ALLEGRO_SAMPLE_INSTANCE*)game->data2);
+		///game->data2 = NULL;
 
-	al_set_sample_instance_playmode(data->szum, ALLEGRO_PLAYMODE_LOOP);
-	al_play_sample_instance(data->szum);
+		al_set_sample_instance_playmode(data->szum, ALLEGRO_PLAYMODE_LOOP);
+		al_play_sample_instance(data->szum);
 	}
+
+	game->data = (void*)1;
+
 }
 
 void Gamestate_Stop(struct Game *game, struct EmptyResources* data) {

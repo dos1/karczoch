@@ -197,13 +197,13 @@ SYMBOL_EXPORT int libsuperderpy_run(struct Game *game) {
 	al_flip_display();
 	al_start_timer(game->_priv.timer);
 
-	struct Gamestate *tmp = game->_priv.gamestates;
+	/*struct Gamestate *tmp = game->_priv.gamestates;
 	while (tmp) {
 		// don't show loading screen on init
 		// TODO: make it configurable
 		tmp->showLoading = false;
 		tmp = tmp->next;
-	}
+	}*/
 
 	char libname[1024] = {};
 	snprintf(libname, 1024, "libsuperderpy-%s-loading" LIBRARY_EXTENSION, game->name);
