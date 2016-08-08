@@ -9,4 +9,4 @@ register_gamestate("bsod")
 register_gamestate("off")
 register_gamestate("screensaver")
 
-add_subdirectory("rust")
+#add_subdirectory("rust")
