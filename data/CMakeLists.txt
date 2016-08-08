@@ -10,5 +10,6 @@ if(UNIX AND NOT APPLE)
 endif(UNIX AND NOT APPLE)
 
 install(DIRECTORY fonts DESTINATION ${DATADIR})
-file(GLOB DATAFILES "*.flac")
+install(DIRECTORY sprites DESTINATION ${DATADIR})
+file(GLOB DATAFILES "*.flac" "*.ogg" "*.png")
 install(FILES ${DATAFILES} DESTINATION ${DATADIR})

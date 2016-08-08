@@ -120,12 +120,12 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 		UnloadGamestate(game, "bsod"); // mark this gamestate to be stopped and unloaded
 		// When there are no active gamestates, the engine will quit.
 	} else if (ev->type==ALLEGRO_EVENT_KEY_DOWN) {
-		if (game->data == (void*)2) {
-			SwitchGamestate(game, "bsod", "off");
-		} else {
-			game->data = 0;
-			SwitchGamestate(game, "bsod", "intro");
-		}
+//		if (game->data == (void*)2) {
+//			SwitchGamestate(game, "bsod", "off");
+//		} else {
+//			game->data = 0;
+		  SwitchGamestate(game, "bsod", "intro");
+//		}
 		game->data = NULL;
 	}
 
