@@ -261,12 +261,15 @@ al_clear_to_color(al_map_rgb(35, 31, 32));
 
 
 char zegarek[64];
-struct timeval  tv;
     struct tm       *tm;
-gettimeofday(&tv, NULL);
-    if((tm = localtime(&tv.tv_sec)) != NULL)
+time_t rawtime = time(NULL);
+    if((tm = localtime(&rawtime)) != NULL)
 		{
-strftime(zegarek, 64, "%l:%M %p", tm);
+#ifdef ALLEGRO_WINDOWS
+	strftime(zegarek, 64, "%I:%M %p", tm);
+#else
+			strftime(zegarek, 64, "%l:%M %p", tm);
+#endif
 		}
 
 		if (data->ie) {
