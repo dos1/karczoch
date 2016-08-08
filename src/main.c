@@ -34,12 +34,12 @@ int main(int argc, char** argv) {
 	srand(time(NULL));
 
 	al_set_org_name("dosowisko.net");
-	al_set_app_name("Karczoch");
+	al_set_app_name("KARCZOCH");
 
 	struct Game *game = libsuperderpy_init(argc, argv, "karczoch");
 	if (!game) { return 1; }
 
-	al_set_window_title(game->display, "Karczoch");
+	al_set_window_title(game->display, "KARCZOCH");
 
 	game->data = (void*)0;
 
