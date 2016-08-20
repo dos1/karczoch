@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "../common.h"
 #include <libsuperderpy.h>
 #include <allegro5/allegro_primitives.h>
 #include "about.h"
@@ -111,7 +112,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	// Called for each event in Allegro event queue.
 	// Here you can handle user input, expiring timers etc.
 	if ((ev->type==ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_ESCAPE)) {
-SwitchGamestate(game, "about", "menu"); 		// When there are no active gamestates, the engine will quit.
+ChangeCurrentGamestate(game, "menu"); 		// When there are no active gamestates, the engine will quit.
 	}
 
 	if ((ev->type==ALLEGRO_EVENT_KEY_CHAR)) {
@@ -131,7 +132,7 @@ SwitchGamestate(game, "about", "menu"); 		// When there are no active gamestates
 	if (ev->type==ALLEGRO_EVENT_KEY_DOWN) {
 		if (ev->keyboard.keycode == ALLEGRO_KEY_ENTER) {
 			if (data->chosen == 1) {
-				SwitchGamestate(game, "about", "menu");
+				ChangeCurrentGamestate(game, "menu");
 			}
 		}
 	}

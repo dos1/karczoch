@@ -19,10 +19,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "../common.h"
 #include <libsuperderpy.h>
 #include <sys/time.h>
 #include <stdio.h>
 #include <math.h>
+#include <allegro5/allegro_ttf.h>
 #include "gaem.h"
 
 char *anims[] = { "party", "cons", "baby", "at", "cons2","homepage", "mchammer", "mercy", "siren","spooky", "hacker", "counter", "new" };
@@ -123,7 +125,7 @@ bool Unbusy(struct Game *game, struct TM_Action *action, enum TM_ActionState sta
 	struct EmptyResources *data = action->arguments->value;
 	if (state == TM_ACTIONSTATE_START) {
 		data->busy = false;
-		al_stop_sample_instance(game->data3);
+		al_stop_sample_instance(game->data->data3);
 
 	}
 	return true;
@@ -385,8 +387,8 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	// Called for each event in Allegro event queue.
 	// Here you can handle user input, expiring timers etc.
 	if ((ev->type==ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_ESCAPE)) {
-		game->data = NULL;
-		SwitchGamestate(game, "gaem", data->lost ? "intro" : "off"); // mark this gamestate to be stopped and unloaded
+		game->data->data = NULL;
+		ChangeCurrentGamestate(game, data->lost ? "intro" : "off"); // mark this gamestate to be stopped and unloaded
 		// When there are no active gamestates, the engine will quit.
 	}
  if (ev->type == ALLEGRO_EVENT_MOUSE_AXES) {
@@ -399,7 +401,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	 if (data->busy) return;
 	 if ((data->mousex * 2 > 15) && (data->mousey * 2 > 70) && (data->mousex * 2 < 60) && (data->mousey * 2 < 140)) {
 		 if (!data->ie) {
-			 al_play_sample_instance(game->data3);
+			 al_play_sample_instance(game->data->data3);
 
 			 data->busy = true;
 			 TM_AddBackgroundAction(data->timeline, ShowSplash, TM_AddToArgs(NULL, 1, data), 500, "splash");
@@ -408,7 +410,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 		 }
 	 } else if ((data->mousex * 2 > 15) && (data->mousey * 2 < 70) && (data->mousex * 2 < 60))  {
 		 if (!data->ie) {
-			 SwitchGamestate(game, "gaem", "bsod");
+			 ChangeCurrentGamestate(game, "bsod");
 		 }
 	 } else if ((data->mousex * 2 > 70) && (data->mousey * 2 < 70) && (data->mousex * 2 < 130))  {
 		 if (!data->ie) {
@@ -446,7 +448,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 
 
 	 if ((data->mousex * 2 < 60) && (data->mousey * 2 > 333)) {
-		 SwitchGamestate(game, "gaem", "off");
+		 ChangeCurrentGamestate(game, "off");
 
 }
 //	 data->ie=true;
@@ -574,7 +576,7 @@ void Gamestate_Start(struct Game *game, struct EmptyResources* data) {
 	// Called when this gamestate gets control. Good place for initializing state,
 	// playing music etc.
 data->debug=0;
-  al_stop_sample_instance(game->data3);
+  al_stop_sample_instance(game->data->data3);
 
 	data->blink_counter = 0;
 	data->screensaver = 0;
@@ -600,7 +602,7 @@ data->debug=0;
 	SelectSpritesheet(game, data->baby, "baby");
 	SetCharacterPosition(game, data->baby, 1, 1, 0);
 
-	if (game->data != (void*)2) {
+	if (game->data->data != (void*)2) {
 		al_set_sample_instance_gain(data->startup, 1.2);
 		al_play_sample_instance(data->startup);
 	}

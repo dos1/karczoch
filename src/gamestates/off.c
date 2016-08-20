@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "../common.h"
 #include <libsuperderpy.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
@@ -44,8 +45,7 @@ void Gamestate_Draw(struct Game *game, struct EmptyResources* data) {
 	//al_identity_transform(&trans);
 	//al_use_transform(&trans);
 
-char* text = "Program has performed an illegal operation and will be terminated.";
-  //al_clear_to_color(al_map_rgb(0,0,0));
+	//al_clear_to_color(al_map_rgb(0,0,0));
 
 al_set_target_bitmap(data->bitmap);
 
@@ -100,7 +100,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 		UnloadGamestate(game, "off"); // mark this gamestate to be stopped and unloaded
 		// When there are no active gamestates, the engine will quit.
 	} else if (ev->type==ALLEGRO_EVENT_KEY_DOWN) {
-		game->data = NULL;
+		game->data->data = NULL;
 		UnloadGamestate(game, "off"); // mark this gamestate to be stopped and unloaded
 	}
 

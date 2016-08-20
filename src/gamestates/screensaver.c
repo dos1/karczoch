@@ -19,9 +19,11 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "../common.h"
 #include <libsuperderpy.h>
 #include <math.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_ttf.h>
 #include "screensaver.h"
 
 int Gamestate_ProgressCount = 3; // number of loading steps as reported by Gamestate_Load
@@ -146,8 +148,8 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	// Called for each event in Allegro event queue.
 	// Here you can handle user input, expiring timers etc.
 	if ((ev->type==ALLEGRO_EVENT_KEY_DOWN) || (ev->type==ALLEGRO_EVENT_MOUSE_AXES) || (ev->type==ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)) {
-		game->data = (void*)2;
-		SwitchGamestate(game, "screensaver", "gaem"); // mark this gamestate to be stopped and unloaded
+		game->data->data = (void*)2;
+		ChangeCurrentGamestate(game, "gaem"); // mark this gamestate to be stopped and unloaded
 		// When there are no active gamestates, the engine will quit.
 	}
 

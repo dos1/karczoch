@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "../common.h"
 #include <libsuperderpy.h>
 #include <allegro5/allegro_primitives.h>
 #include "intro.h"
@@ -33,8 +34,8 @@ void Gamestate_Logic(struct Game *game, struct EmptyResources* data) {
 		data->chosen++;
 	}
 
-	if(data->chosen > (game->data ? 2 : 6)) {
-		SwitchGamestate(game, "intro", game->data ? "dosowisko" : "menu");
+	if(data->chosen > (game->data->data ? 2 : 6)) {
+		ChangeCurrentGamestate(game, game->data->data ? "dosowisko" : "menu");
 	}
 }
 
@@ -93,7 +94,7 @@ al_clear_to_color(al_map_rgb(35, 31, 32));
 	al_draw_scaled_bitmap(data->floppy, 0, 0, 240, 180, 240, 120, 80, 60, 0);
 	if(data->chosen > 3) {
 
-		if (!game->data)
+		if (!game->data->data)
 			al_draw_scaled_bitmap(data->floppyinuse, 0, 0, 240, 180, 240, 120, 80, 60, 0);
 }
 
@@ -105,7 +106,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	// Called for each event in Allegro event queue.
 	// Here you can handle user input, expiring timers etc.
 	if ((ev->type==ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_ESCAPE)) {
-		SwitchGamestate(game, "intro", game->data ? "gaem" : "menu"); // mark this gamestate to be stopped and unloaded
+		ChangeCurrentGamestate(game, game->data->data ? "gaem" : "menu"); // mark this gamestate to be stopped and unloaded
 		// When there are no active gamestates, the engine will quit.
 	}
 
@@ -140,12 +141,12 @@ PrintConsole(game, "%s", al_get_shader_log(data->shader));
 	ALLEGRO_SAMPLE *pc_sample = al_load_sample(GetDataFilePath(game, "pc.ogg"));
 	ALLEGRO_SAMPLE_INSTANCE *pc = al_create_sample_instance(pc_sample);
 	al_attach_sample_instance_to_mixer(pc, game->audio.music);
-	game->data2 = (void*) pc;
+	game->data->data2 = (void*) pc;
 
 	pc_sample = al_load_sample(GetDataFilePath(game, "hdd.flac"));
 	pc = al_create_sample_instance(pc_sample);
 	al_attach_sample_instance_to_mixer(pc, game->audio.fx);
-game->data3 = (void*) pc;
+game->data->data3 = (void*) pc;
 
   return data;
 }
@@ -162,12 +163,12 @@ void Gamestate_Start(struct Game *game, struct EmptyResources* data) {
 	// playing music etc.
 	data->blink_counter = 0;
 
-	if (game->data!=(void*)1) {
-		if (game->data2)
-			al_play_sample_instance(game->data2);
+	if (game->data->data!=(void*)1) {
+		if (game->data->data2)
+			al_play_sample_instance(game->data->data2);
 
 	} else {
-		al_play_sample_instance(game->data3);
+		al_play_sample_instance(game->data->data3);
 	}
 
 	data->chosen = 1;

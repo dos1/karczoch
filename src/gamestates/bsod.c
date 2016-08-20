@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "../common.h"
 #include <libsuperderpy.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
@@ -124,9 +125,9 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 //			SwitchGamestate(game, "bsod", "off");
 //		} else {
 //			game->data = 0;
-		  SwitchGamestate(game, "bsod", "intro");
+		  ChangeCurrentGamestate(game, "intro");
 //		}
-		game->data = NULL;
+		game->data->data = NULL;
 	}
 
 }

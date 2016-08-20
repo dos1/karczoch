@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "../common.h"
 #include <libsuperderpy.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
@@ -139,16 +140,16 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	if (ev->type==ALLEGRO_EVENT_KEY_DOWN) {
 		if (ev->keyboard.keycode == ALLEGRO_KEY_ENTER) {
 			if (data->chosen == 1) {
-				SwitchGamestate(game, "menu", "intro");
+				ChangeCurrentGamestate(game, "intro");
 			}
 			if (data->chosen == 2) {
-				SwitchGamestate(game, "menu", "options");
+				ChangeCurrentGamestate(game, "options");
 			}
 			if (data->chosen == 3) {
-				SwitchGamestate(game, "menu", "about");
+				ChangeCurrentGamestate(game, "about");
 			}
 			if (data->chosen == 4) {
-				UnloadGamestate(game, "menu");
+				UnloadAllGamestates(game);
 			}
 		}
 	}
@@ -201,15 +202,15 @@ void Gamestate_Start(struct Game *game, struct EmptyResources* data) {
 
 	data->chosen = 1;
 
-	if (!game->data) {
-		al_stop_sample_instance((ALLEGRO_SAMPLE_INSTANCE*)game->data2);
-		///game->data2 = NULL;
+	if (!game->data->data) {
+		al_stop_sample_instance((ALLEGRO_SAMPLE_INSTANCE*)game->data->data2);
+		///game->data->data2 = NULL;
 
 		al_set_sample_instance_playmode(data->szum, ALLEGRO_PLAYMODE_LOOP);
 		al_play_sample_instance(data->szum);
 	}
 
-	game->data = (void*)1;
+	game->data->data = (void*)1;
 
 }
 

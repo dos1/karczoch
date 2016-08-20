@@ -21,7 +21,11 @@
 
 #include <stdio.h>
 #include <signal.h>
+#include "common.h"
 #include <libsuperderpy.h>
+
+#define GAMENAME "karczoch"
+#define PRETTY_GAMENAME "KARCZOCH"
 
 void derp(int sig) {
 	ssize_t __attribute__((unused)) n = write(STDERR_FILENO, "Segmentation fault\nI just don't know what went wrong!\n", 54);
@@ -34,14 +38,12 @@ int main(int argc, char** argv) {
 	srand(time(NULL));
 
 	al_set_org_name("dosowisko.net");
-	al_set_app_name("KARCZOCH");
+	al_set_app_name(PRETTY_GAMENAME);
 
-	struct Game *game = libsuperderpy_init(argc, argv, "karczoch");
+	struct Game *game = libsuperderpy_init(argc, argv, GAMENAME);
 	if (!game) { return 1; }
 
-	al_set_window_title(game->display, "KARCZOCH");
-
-	game->data = (void*)0;
+	al_set_window_title(game->display, PRETTY_GAMENAME);
 
 	LoadGamestate(game, "intro");
 	LoadGamestate(game, "menu");
@@ -54,10 +56,13 @@ int main(int argc, char** argv) {
 	LoadGamestate(game, "screensaver");
 	StartGamestate(game, "intro");
 
-	al_hide_mouse_cursor(game->display);
+	game->show_loading_on_launch = true;
 
+	game->data = CreateGameData(game);
 
 	libsuperderpy_run(game);
+
+	DestroyGameData(game, game->data);
 
 	libsuperderpy_destroy(game);
 

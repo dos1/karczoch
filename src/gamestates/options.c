@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "../common.h"
 #include <libsuperderpy.h>
 #include <allegro5/allegro_primitives.h>
 #include "options.h"
@@ -110,7 +111,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 	// Called for each event in Allegro event queue.
 	// Here you can handle user input, expiring timers etc.
 	if ((ev->type==ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_ESCAPE)) {
-		SwitchGamestate(game, "options", "menu"); // mark this gamestate to be stopped and unloaded
+		ChangeCurrentGamestate(game, "menu"); // mark this gamestate to be stopped and unloaded
 		// When there are no active gamestates, the engine will quit.
 	}
 
@@ -170,7 +171,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 				SetConfigOption(game, "KARCZOCH", "homealone", data->homealone ? "1" : "0");
 			}
 			if (data->chosen == 5) {
-				SwitchGamestate(game, "options", "menu");
+				ChangeCurrentGamestate(game, "menu");
 			}
 		}
 	}

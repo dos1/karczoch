@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#include "../common.h"
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
 #include <math.h>
@@ -61,7 +62,7 @@ bool End(struct Game *game, struct TM_Action *action, enum TM_ActionState state)
 }
 
 bool RealEnd(struct Game *game, struct TM_Action *action, enum TM_ActionState state) {
-	if (state == TM_ACTIONSTATE_RUNNING) SwitchGamestate(game, "dosowisko", "gaem");
+	if (state == TM_ACTIONSTATE_RUNNING) ChangeCurrentGamestate(game, "gaem");
 	return true;
 }
 
@@ -228,7 +229,7 @@ void Gamestate_Start(struct Game *game, struct dosowiskoResources* data) {
 void Gamestate_ProcessEvent(struct Game *game, struct dosowiskoResources* data, ALLEGRO_EVENT *ev) {
 	TM_HandleEvent(data->timeline, ev);
 	if ((ev->type==ALLEGRO_EVENT_KEY_DOWN) && (ev->keyboard.keycode == ALLEGRO_KEY_ESCAPE)) {
-		SwitchGamestate(game, "dosowisko", "gaem");
+		ChangeCurrentGamestate(game, "gaem");
 	}
 }
 
