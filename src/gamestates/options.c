@@ -151,7 +151,7 @@ void Gamestate_ProcessEvent(struct Game *game, struct EmptyResources* data, ALLE
 				else
 					  SetConfigOption(game, "SuperDerpy", "fullscreen", "0");
 				al_set_display_flag(game->display, ALLEGRO_FULLSCREEN_WINDOW, game->config.fullscreen);
-				SetupViewport(game);
+				SetupViewport(game, game->viewport_config);
 				PrintConsole(game, "Fullscreen toggled");
 			}
 			if (data->chosen == 2) {
