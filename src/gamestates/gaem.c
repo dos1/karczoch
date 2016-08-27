@@ -537,27 +537,25 @@ data->gif = al_create_bitmap(461, 194);
 
 	progress(game);
 	data->midi1 = al_load_audio_stream(GetDataFilePath(game, "midi1.ogg"), 4, 1024);
+	al_set_audio_stream_playing(data->midi1, false);
 	al_attach_audio_stream_to_mixer(data->midi1, game->audio.music);
 	progress(game);
 	data->midi2 = al_load_audio_stream(GetDataFilePath(game, "midi2.ogg"), 4, 1024);
+	al_set_audio_stream_playing(data->midi2, false);
 	al_attach_audio_stream_to_mixer(data->midi2, game->audio.music);
 	progress(game);
 	data->midi3 = al_load_audio_stream(GetDataFilePath(game, "midi3.ogg"), 4, 1024);
+	al_set_audio_stream_playing(data->midi3, false);
 	al_attach_audio_stream_to_mixer(data->midi3, game->audio.music);
 	progress(game);
 	data->midi4 = al_load_audio_stream(GetDataFilePath(game, "midi4.ogg"), 4, 1024);
+	al_set_audio_stream_playing(data->midi4, false);
 	al_attach_audio_stream_to_mixer(data->midi4, game->audio.music);
 
 	al_set_audio_stream_playmode(data->midi1, ALLEGRO_PLAYMODE_LOOP);
 	al_set_audio_stream_playmode(data->midi2, ALLEGRO_PLAYMODE_LOOP);
 	al_set_audio_stream_playmode(data->midi3, ALLEGRO_PLAYMODE_LOOP);
 	al_set_audio_stream_playmode(data->midi4, ALLEGRO_PLAYMODE_LOOP);
-
-	al_set_audio_stream_playing(data->midi1, false);
-	al_set_audio_stream_playing(data->midi2, false);
-	al_set_audio_stream_playing(data->midi3, false);
-	al_set_audio_stream_playing(data->midi4, false);
-
 
 	return data;
 }
